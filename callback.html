@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuickBooks MCP Callback</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --panel: #ffffff;
+        --text: #182235;
+        --muted: #69758d;
+        --accent: #16a34a;
+        --warn: #dc2626;
+        --border: #dce4ef;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: var(--text);
+        background: linear-gradient(180deg, #fafcff 0%, var(--bg) 100%);
+      }
+
+      main {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .card {
+        width: min(680px, 100%);
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 36px;
+        box-shadow: 0 18px 54px rgba(15, 23, 42, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        font-size: clamp(28px, 4vw, 42px);
+        line-height: 1.1;
+      }
+
+      p {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.7;
+      }
+
+      .status {
+        margin-top: 20px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #f7fafc;
+      }
+
+      .status strong {
+        color: var(--accent);
+      }
+
+      .status.error strong {
+        color: var(--warn);
+      }
+
+      code {
+        background: #eef3f8;
+        border-radius: 8px;
+        padding: 2px 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <h1>Completing QuickBooks authentication</h1>
+        <p id="message">
+          This page forwards the Intuit authorization result to your local MCP
+          callback listener.
+        </p>
+        <div class="status" id="status">
+          <strong>Redirecting...</strong>
+        </div>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const status = document.getElementById("status");
+        const message = document.getElementById("message");
+        const params = window.location.search || "";
+        const target = "http://localhost:8000/callback" + params;
+
+        if (!params) {
+          status.className = "status error";
+          status.innerHTML = "<strong>Missing OAuth parameters.</strong>";
+          message.textContent =
+            "Intuit did not return an authorization response to this callback page.";
+          return;
+        }
+
+        status.innerHTML =
+          "<strong>Forwarding to local callback:</strong> <code>" + target + "</code>";
+
+        setTimeout(function () {
+          window.location.replace(target);
+        }, 300);
+      })();
+    </script>
+  </body>
+</html>
